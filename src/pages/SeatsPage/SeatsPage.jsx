@@ -1,51 +1,140 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router"
 import styled from "styled-components"
 
-export default function SeatsPage() {
+export default function SeatsPage(props) {
+    const {dadosCompra, setDadosCompra} = props; 
+
+    const {idSessao} = useParams();
+    const [assentos, setAssentos] = useState(undefined);
+    const [filme, setFilme] = useState([]);
+    const [infosGerais, setInfosGerais] = useState([]);
+    const [selecionados, setSelecionados] = useState([]);
+    const [nome, setNome] = useState('');
+    const [cpf, setCpf] = useState('');
+    const [numeroAssentos, setNumeroAssentos] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+
+        const promise = axios.get(`https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idSessao}/seats`);
+
+        promise.then(res => {
+            console.log(res.data);
+            setAssentos(res.data.seats);
+            setFilme(res.data.movie);
+            setInfosGerais(res.data);
+
+        })
+
+    }, [])
+
+    function selecionarAssento(selecionado, id){
+        
+        if(!selecionado){
+            alert('Este assento não está disponível');
+        }else if(selecionados.includes(id)){
+            const index = selecionados.indexOf(id);
+            selecionados.splice(index, 1);
+            setSelecionados([...selecionados]);
+        }else{
+            setSelecionados([...selecionados, id]);
+        }
+    }
+    const numAssentos = [];
+    function buscarNumAssentos(assentos, selecionados){
+        
+
+        assentos.forEach(assento =>{
+            if(selecionados.includes(assento.id)){
+                numAssentos.push(assento.name)
+            }
+        })
+    }
+
+    function reservarAssentos(e){
+        e.preventDefault();
+
+        const objReserva = {
+            ids: selecionados,
+	        name: nome,
+	        cpf: cpf
+        }
+        
+        const promise = axios.post('https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many', objReserva);
+        promise.then(res => {
+            
+            buscarNumAssentos(assentos, selecionados);
+
+            const objCompra = {
+                nomeFilme: infosGerais.movie.title,
+                horario: infosGerais.name,
+                data: infosGerais.day.date,
+                assentos: numAssentos,
+                nome,
+                cpf
+            };
+
+            setDadosCompra(objCompra);
+            navigate('/sucesso');
+        })
+        promise.catch(res => alert(res.data.response.message))
+    }
+    
+    if(assentos === undefined){
+        return <><p>Carregando...</p></>
+    }
 
     return (
         <PageContainer>
             Selecione o(s) assento(s)
 
             <SeatsContainer>
-                <SeatItem>01</SeatItem>
-                <SeatItem>02</SeatItem>
-                <SeatItem>03</SeatItem>
-                <SeatItem>04</SeatItem>
-                <SeatItem>05</SeatItem>
+                {assentos.map(assento =>
+                    <SeatItem 
+                        onClick={() => selecionarAssento(assento.isAvailable, assento.id)}
+                        indisponivel = {!assento.isAvailable}
+                        selected = {selecionados.includes(assento.id)}
+                    >{assento.name}</SeatItem>
+                )}
+                
             </SeatsContainer>
 
             <CaptionContainer>
                 <CaptionItem>
-                    <CaptionCircle />
+                    <CaptionCircle borda= {'#0E7D71'} cor = {'#1AAE9E'}/>
                     Selecionado
                 </CaptionItem>
                 <CaptionItem>
-                    <CaptionCircle />
+                    <CaptionCircle borda= {'#7B8B99'} cor = {'#C3CFD9'}/>
                     Disponível
                 </CaptionItem>
                 <CaptionItem>
-                    <CaptionCircle />
+                    <CaptionCircle borda= {'#F7C52B'} cor = {'#FBE192'}/>
                     Indisponível
                 </CaptionItem>
             </CaptionContainer>
 
             <FormContainer>
-                Nome do Comprador:
-                <input placeholder="Digite seu nome..." />
+                <form onSubmit={reservarAssentos}>
+                    <label htmlFor="nome">Nome do Comprador:</label>
+                    <input id="nome" name="nome" onChange={e => setNome(e.target.value)} value={nome} placeholder="Digite seu nome..."  required/>
 
-                CPF do Comprador:
-                <input placeholder="Digite seu CPF..." />
+                    <label htmlFor="cpf">CPF do Comprador:</label>
+                    <input id="cpf" name="cpf" onChange={e => setCpf(e.target.value)} value={cpf} placeholder="Digite seu CPF..." required/>
 
-                <button>Reservar Assento(s)</button>
+                    <button type="submit">Reservar Assento(s)</button>
+                </form>
             </FormContainer>
 
             <FooterContainer>
                 <div>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster" />
+                    <img src={filme.posterURL} alt="poster" />
                 </div>
                 <div>
-                    <p>Tudo em todo lugar ao mesmo tempo</p>
-                    <p>Sexta - 14h00</p>
+                    <p>{filme.title}</p>
+                    <p>{infosGerais.day.weekday} - {infosGerais.name}</p>
                 </div>
             </FooterContainer>
 
@@ -74,7 +163,7 @@ const SeatsContainer = styled.div`
     justify-content: center;
     margin-top: 20px;
 `
-const FormContainer = styled.div`
+const  FormContainer = styled.div`
     width: calc(100vw - 40px); 
     display: flex;
     flex-direction: column;
@@ -96,8 +185,8 @@ const CaptionContainer = styled.div`
     margin: 20px;
 `
 const CaptionCircle = styled.div`
-    border: 1px solid blue;         // Essa cor deve mudar
-    background-color: lightblue;    // Essa cor deve mudar
+    border: 1px solid ${props => props.borda};         // Essa cor deve mudar
+    background-color: ${props => props.cor};    // Essa cor deve mudar
     height: 25px;
     width: 25px;
     border-radius: 25px;
@@ -113,8 +202,25 @@ const CaptionItem = styled.div`
     font-size: 12px;
 `
 const SeatItem = styled.div`
-    border: 1px solid blue;         // Essa cor deve mudar
-    background-color: lightblue;    // Essa cor deve mudar
+    border: 1px solid;       // Essa cor deve mudar
+    border-color: ${props => {
+        if(props.selected){
+            return '#0E7D71';
+        }if(props.indisponivel){
+            return '#F7C52B'
+        }else{     
+        return '#7B8B99'
+        }
+        }};
+    background-color: ${props => {
+        if(props.selected){
+            return '#1AAE9E';
+        }if(props.indisponivel){
+            return '#FBE192'
+        }else{     
+        return '#C3CFD9'
+        }
+        }};
     height: 25px;
     width: 25px;
     border-radius: 25px;

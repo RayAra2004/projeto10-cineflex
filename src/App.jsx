@@ -3,16 +3,27 @@ import HomePage from "./pages/HomePage/HomePage"
 import SeatsPage from "./pages/SeatsPage/SeatsPage"
 import SessionsPage from "./pages/SessionsPage/SessionsPage"
 import SuccessPage from "./pages/SuccessPage/SuccessPage"
+import axios from "axios"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { useState } from "react"
+
+
 
 export default function App() {
+    axios.defaults.headers.common['Authorization'] = 'UvCOyV5c1Y6lCtoZMh8W2Wma';
+    const [dadosCompra, setDadosCompra] = useState(undefined);
+
     return (
         <>
-           <NavContainer>CINEFLEX</NavContainer>
-
-            <HomePage />
-            {/* <SeatsPage /> */}
-            {/* <SessionsPage /> */}
-            {/* <SuccessPage /> */}
+            <BrowserRouter>
+                <NavContainer>CINEFLEX</NavContainer>
+                <Routes>
+                    <Route path="/" element= {<HomePage />}></Route>
+                    <Route path="/sessoes/:idFilme" element= {<SessionsPage />}></Route>
+                    <Route path="/assentos/:idSessao" element= {<SeatsPage dadosCompra = {dadosCompra} setDadosCompra = {setDadosCompra}/>}></Route>
+                    <Route path="/sucesso" element= {<SuccessPage dadosCompra = {dadosCompra} />}></Route>  
+                </Routes>
+            </BrowserRouter>
         </>
     )
 }
