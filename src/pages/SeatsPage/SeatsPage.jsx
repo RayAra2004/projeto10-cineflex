@@ -42,7 +42,9 @@ export default function SeatsPage(props) {
             setSelecionados([...selecionados, id]);
         }
     }
+
     const numAssentos = [];
+
     function buscarNumAssentos(assentos, selecionados){
         
 
@@ -96,6 +98,7 @@ export default function SeatsPage(props) {
                         onClick={() => selecionarAssento(assento.isAvailable, assento.id)}
                         indisponivel = {!assento.isAvailable}
                         selected = {selecionados.includes(assento.id)}
+                        data-test="seat"
                     >{assento.name}</SeatItem>
                 )}
                 
@@ -119,16 +122,16 @@ export default function SeatsPage(props) {
             <FormContainer>
                 <form onSubmit={reservarAssentos}>
                     <label htmlFor="nome">Nome do Comprador:</label>
-                    <input id="nome" name="nome" onChange={e => setNome(e.target.value)} value={nome} placeholder="Digite seu nome..."  required/>
+                    <input data-test="client-name" id="nome" name="nome" onChange={e => setNome(e.target.value)} value={nome} placeholder="Digite seu nome..."  required/>
 
                     <label htmlFor="cpf">CPF do Comprador:</label>
-                    <input id="cpf" name="cpf" onChange={e => setCpf(e.target.value)} value={cpf} placeholder="Digite seu CPF..." required/>
+                    <input data-test="client-cpf" id="cpf" name="cpf" onChange={e => setCpf(e.target.value)} value={cpf} placeholder="Digite seu CPF..." required/>
 
-                    <button type="submit">Reservar Assento(s)</button>
+                    <button data-test="book-seat-btn" type="submit">Reservar Assento(s)</button>
                 </form>
             </FormContainer>
 
-            <FooterContainer>
+            <FooterContainer data-test="footer">
                 <div>
                     <img src={filme.posterURL} alt="poster" />
                 </div>

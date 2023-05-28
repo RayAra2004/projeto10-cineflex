@@ -7,13 +7,13 @@ export default function SuccessPage(props) {
         <PageContainer>
             <h1>Pedido feito <br /> com sucesso!</h1>
 
-            <TextContainer>
+            <TextContainer data-test="movie-info">
                 <strong><p>Filme e sessão</p></strong>
                 <p>{dadosCompra.nomeFilme}</p>
                 <p>{dadosCompra.data} - {dadosCompra.horario}</p>
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer data-test="seats-info">
                 <strong><p>Ingressos</p></strong>
                 {dadosCompra.assentos.map(assento =>
                     <p>Assento {assento}</p>
@@ -21,12 +21,12 @@ export default function SuccessPage(props) {
         
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer data-test="client-info">
                 <strong><p>Comprador</p></strong>
                 <p>Nome: {dadosCompra.nome}</p>
                 <p>CPF: {dadosCompra.cpf}</p>
             </TextContainer>
-            <Link to={'/'}>
+            <Link to={'/'} data-test="go-home-btn">
                 <button>Voltar para Home</button>
             </Link>
         </PageContainer>

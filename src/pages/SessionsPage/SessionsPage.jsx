@@ -29,11 +29,11 @@ export default function SessionsPage() {
             <div>
                     {
                     sessoes.days.map(sessao =>
-                        <SessionContainer key={sessao.id}>
+                        <SessionContainer key={sessao.id} data-test="movie-day">
                             {sessao.weekday} - {sessao.date}
                             <ButtonsContainer>
                                 {sessao.showtimes.map(time =>
-                                    <Link key={time.id} to={`/assentos/${time.id}`}>
+                                    <Link key={time.id} to={`/assentos/${time.id}`} data-test="showtime">
                                         <button >{time.name}</button>
                                     </Link>
                                     )}
@@ -42,7 +42,7 @@ export default function SessionsPage() {
                     )}
             </div>
 
-            <FooterContainer>
+            <FooterContainer data-test="footer">
                 <div>
                     <img src={sessoes.posterURL} alt={sessoes.title} />
                 </div>
@@ -84,6 +84,22 @@ const ButtonsContainer = styled.div`
     margin: 20px 0;
     button {
         margin-right: 20px;
+        background: #E8833A;
+        border-radius: 3px;
+        color: #FFFFFF;
+        width: 82px;
+        height: 43px;
+        font-family: 'Roboto';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 21px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.02em;
+        color: #FFFFFF;
+        border: none;
     }
     a {
         text-decoration: none;
